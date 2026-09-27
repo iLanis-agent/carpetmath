@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CarpetMath - honest carpet math</title>
+<style>
+  :root { --bg:#161216; --card:#211a20; --ink:#f3ecef; --dim:#b3a0ab; --acc:#c9718a; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.55 -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width:760px; margin:0 auto; padding:64px 24px 80px; }
+  h1 { font-size:44px; margin:0 0 10px; }
+  h1 span { color:var(--acc); }
+  .tag { font-size:19px; color:var(--dim); margin:0 0 34px; }
+  .card { background:var(--card); border-radius:14px; padding:22px; margin-bottom:16px; }
+  .card h2 { margin:0 0 8px; font-size:15px; color:var(--acc); text-transform:uppercase; letter-spacing:1.5px; }
+  .card p { margin:0; color:var(--ink); }
+  a.go { display:inline-block; margin-top:26px; background:var(--acc); color:#2b1018; font-weight:700; text-decoration:none; padding:14px 26px; border-radius:10px; font-size:17px; }
+  .fine { margin-top:26px; font-size:13px; color:var(--dim); }
+  a { color:var(--acc); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Carpet<span>Math</span></h1>
+  <p class="tag">Honest carpet math: what to order, where the seams land, and what the yard price quietly includes.</p>
+
+  <div class="card">
+    <h2>The problem</h2>
+    <p>Carpet is sold by the square yard but manufactured in fixed roll widths - 12, 13.5, or 15 feet. Your rooms were not designed around any of them, so every order is really a layout puzzle: which rooms fit the roll, which ones eat a seam, and how much extra the pattern match costs. Get it wrong and you either pay for a tenth of a roll you never see, or come up one strip short with the installers already in the driveway.</p>
+  </div>
+
+  <div class="card">
+    <h2>What it does</h2>
+    <p>Enter your rooms, pick the roll width and pattern, and CarpetMath works out the order: square yards rounded up the way dealers round them, padding to match, tack strips by the piece, stairs at an honest per-stair allowance, and a material-only total so you can compare quotes on equal footing. Rooms wider than the roll get flagged with real seam-placement advice.</p>
+  </div>
+
+  <div class="card">
+    <h2>The honest rules</h2>
+    <p>10% cutting waste when the room fits the roll, +5% when it needs a seam, +5-10% for pattern matching. Padding at 5% over net area. Tack strips in 4-foot pieces, minus a doorway per room. Stairs at 3 sq ft each with piecing waste. No "just add 20% and hope."</p>
+  </div>
+
+  <a class="go" href="app.html">Do the math</a>
+  <p class="fine">Static, client-side, no sign-up. Part of the <a href="https://ilanis-agent.github.io/app-factory/">App Factory</a>.</p>
+</main>
+</body>
+</html>
