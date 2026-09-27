@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CarpetMath - honest carpet math</title>
+<style>
+  :root { --bg:#161216; --card:#211a20; --ink:#f3ecef; --dim:#b3a0ab; --acc:#c9718a; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.5 -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header { padding:28px 24px 8px; max-width:980px; margin:0 auto; display:flex; justify-content:space-between; align-items:baseline; }
+  h1 { margin:0; font-size:28px; }
+  h1 span { color:var(--acc); }
+  nav a { color:var(--dim); text-decoration:none; font-size:14px; }
+  main { max-width:980px; margin:0 auto; padding:16px 24px 60px; display:grid; gap:18px; }
+  .card { background:var(--card); border-radius:14px; padding:20px; }
+  .card h2 { margin:0 0 12px; font-size:13px; letter-spacing:1.5px; color:var(--dim); text-transform:uppercase; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; }
+  label { display:block; font-size:13px; color:var(--dim); margin-bottom:4px; }
+  input, select { width:100%; background:#1a1519; border:1px solid #4d3a45; color:var(--ink); border-radius:8px; padding:9px 10px; font-size:15px; }
+  .hint { font-size:12.5px; color:var(--dim); margin-top:10px; }
+  button { cursor:pointer; border:0; border-radius:9px; padding:11px 16px; font-size:15px; background:var(--acc); color:#2b1018; font-weight:600; }
+  button.ghost { background:#3d2d36; color:var(--ink); font-weight:500; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+  .verdict { font-size:17px; line-height:1.65; }
+  .verdict b { color:var(--acc); }
+  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-top:16px; }
+  .stat { background:#1a1519; border-radius:10px; padding:12px; }
+  .stat .v { font-size:19px; font-weight:700; color:var(--acc); }
+  .stat .k { font-size:12px; color:var(--dim); margin-top:2px; }
+  .warn { background:#33202a; border:1px solid #6b4053; border-radius:10px; padding:12px 14px; margin-top:14px; font-size:14px; color:#eecdd8; }
+  .rooms .rrow { display:grid; grid-template-columns: 1.4fr 1fr 1fr auto; gap:8px; margin-bottom:8px; align-items:end; }
+  .rooms .rrow button { padding:9px 12px; }
+  table.bd { width:100%; border-collapse:collapse; margin-top:6px; font-size:14.5px; }
+  table.bd td { padding:7px 4px; border-bottom:1px solid #352a33; }
+  table.bd td:last-child { text-align:right; color:var(--acc); font-weight:600; }
+  .fine { font-size:12.5px; color:var(--dim); margin-top:8px; }
+  a { color:var(--acc); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Carpet<span>Math</span></h1>
+  <nav><a href="index.html">about</a></nav>
+</header>
+<main>
+  <section class="card">
+    <h2>Your rooms</h2>
+    <div class="rooms" id="rooms"></div>
+    <div class="row">
+      <button class="ghost" id="addRoom">+ add room</button>
+    </div>
+    <p class="hint">Measure wall to wall at the widest points. Closets count - add them as tiny rooms.</p>
+  </section>
+
+  <section class="card">
+    <h2>The carpet</h2>
+    <div class="grid">
+      <div>
+        <label for="roll">Roll width</label>
+        <select id="roll">
+          <option value="12">12 ft (most common)</option>
+          <option value="13.5">13.5 ft</option>
+          <option value="15">15 ft</option>
+        </select>
+      </div>
+      <div>
+        <label for="pattern">Pattern</label>
+        <select id="pattern">
+          <option value="none">Solid / texture</option>
+          <option value="small">Small repeat</option>
+          <option value="large">Large repeat</option>
+        </select>
+      </div>
+      <div>
+        <label for="stairs">Stairs (count)</label>
+        <input id="stairs" type="number" min="0" max="40" step="1" value="0">
+      </div>
+      <div>
+        <label for="price">Carpet $ / sq yd</label>
+        <input id="price" type="number" min="0" max="200" step="0.5" value="32">
+      </div>
+      <div>
+        <label for="padprice">Padding $ / sq yd</label>
+        <input id="padprice" type="number" min="0" max="50" step="0.5" value="6">
+      </div>
+    </div>
+    <div class="row">
+      <button id="go">Do the math</button>
+      <button class="ghost" data-preset="upstairs">3-bed upstairs</button>
+      <button class="ghost" data-preset="basement">Basement rec room</button>
+      <button class="ghost" data-preset="mainfloor">Whole main floor</button>
+    </div>
+  </section>
+
+  <section class="card" id="out" hidden>
+    <h2>Your order</h2>
+    <div class="verdict" id="verdict"></div>
+    <div class="stats" id="stats"></div>
+    <div id="warnbox"></div>
+    <table class="bd" id="breakdown"></table>
+    <p class="fine">Material only. Labor, furniture moving, old-carpet rip-out and disposal are separate line items on any real quote - ask for them in writing.</p>
+  </section>
+
+  <section class="card">
+    <h2>What the salesperson will not volunteer</h2>
+    <table class="bd">
+      <tr><td>Seams are a layout decision, not a defect</td><td>a room wider than the roll gets a seam; put it under furniture, away from the main light source and traffic path</td></tr>
+      <tr><td>Nap runs one direction</td><td>every cut in a room must lay the same way or the color reads as two different carpets</td></tr>
+      <tr><td>Sold by the square yard, rounded up</td><td>most dealers quote in whole or half yards - you pay for the rounding</td></tr>
+      <tr><td>Pattern match costs material</td><td>a large repeat can waste 10% before the first cut; a solid does not</td></tr>
+      <tr><td>Padding is not the place to save</td><td>cheap padding is how a good carpet feels worn in three years - 8 lb rebond is the floor</td></tr>
+      <tr><td>"Free installation" is never free</td><td>it is folded into the yard price; compare the total, not the line items</td></tr>
+    </table>
+  </section>
+</main>
+<script src="engine.js"></script>
+<script>
+(function () {
+  var roomsEl = document.getElementById('rooms');
+  var roomSeq = 0;
+
+  function addRoom(name, L, W) {
+    roomSeq++;
+    var div = document.createElement('div');
+    div.className = 'rrow';
+    div.innerHTML =
+      '<div><label>Name</label><input class="rname" value="' + name + '"></div>' +
+      '<div><label>Length (ft)</label><input class="rlen" type="number" min="1" max="80" step="0.5" value="' + L + '"></div>' +
+      '<div><label>Width (ft)</label><input class="rwid" type="number" min="1" max="80" step="0.5" value="' + W + '"></div>' +
+      '<button class="ghost rdel" title="remove">x</button>';
+    div.querySelector('.rdel').addEventListener('click', function () {
+      if (roomsEl.children.length > 1) div.remove();
+    });
+    roomsEl.appendChild(div);
+  }
+
+  function readRooms() {
+    var out = [];
+    roomsEl.querySelectorAll('.rrow').forEach(function (div) {
+      var L = parseFloat(div.querySelector('.rlen').value) || 0;
+      var W = parseFloat(div.querySelector('.rwid').value) || 0;
+      if (L > 0 && W > 0) out.push({ name: div.querySelector('.rname').value || 'Room', lengthFt: L, widthFt: W });
+    });
+    return out;
+  }
+
+  function money(x) { return '$' + x.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function fmt(x) { return x.toLocaleString('en-US', { maximumFractionDigits: 1 }); }
+
+  function render() {
+    var rooms = readRooms();
+    if (!rooms.length) { document.getElementById('out').hidden = true; return; }
+    var p = CarpetMath.plan({
+      rooms: rooms,
+      rollWidth: parseFloat(document.getElementById('roll').value),
+      pattern: document.getElementById('pattern').value,
+      stairs: parseInt(document.getElementById('stairs').value, 10) || 0,
+      pricePerSqYd: parseFloat(document.getElementById('price').value) || 0,
+      paddingPerSqYd: parseFloat(document.getElementById('padprice').value) || 0
+    });
+
+    var stairBit = p.stairSqFt > 0 ? ' plus ' + fmt(p.stairSqFt) + ' sq ft of stairs' : '';
+    document.getElementById('verdict').innerHTML =
+      'Order <b>' + fmt(p.orderSqYd) + ' sq yd</b> of carpet and <b>' + p.paddingSqYd +
+      ' sq yd</b> of padding for ' + fmt(p.totalArea) + ' sq ft of floor' + stairBit +
+      ', with <b>' + p.tackPieces + '</b> tack strips. Material total <b>' + money(p.totalCost) + '</b>.';
+
+    var stats = [
+      ['Carpet to order', fmt(p.orderSqYd) + ' sq yd'],
+      ['Floor area', fmt(p.totalArea) + ' sq ft'],
+      ['Padding', p.paddingSqYd + ' sq yd'],
+      ['Tack strips', p.tackPieces + ' pieces'],
+      ['Seamed rooms', p.seamRooms],
+      ['Material total', money(p.totalCost)]
+    ];
+    document.getElementById('stats').innerHTML = stats.map(function (s) {
+      return '<div class="stat"><div class="v">' + s[1] + '</div><div class="k">' + s[0] + '</div></div>';
+    }).join('');
+
+    var warns = [];
+    p.rooms.forEach(function (r) {
+      if (!r.fits) warns.push('<b>' + r.name + '</b> is wider than the roll - it needs a seam. Run it under the biggest piece of furniture, perpendicular to the main window light.');
+    });
+    if (p.rooms.some(function (r) { return r.wasteMult >= 1.20; }))
+      warns.push('Large pattern repeat: the ' + fmt(p.orderSqFt - p.totalArea) + ' sq ft of waste you are buying is mostly pattern matching. A solid would need about 10% less material.');
+    document.getElementById('warnbox').innerHTML = warns.map(function (w) {
+      return '<div class="warn">' + w + '</div>';
+    }).join('');
+
+    var rows = [['Carpet (' + fmt(p.orderSqYd) + ' sq yd)', money(p.carpetCost)],
+                ['Padding (' + p.paddingSqYd + ' sq yd)', money(p.paddingCost)],
+                ['Tack strips (' + p.tackPieces + ')', money(p.tackCost)],
+                ['Material total', money(p.totalCost)]];
+    document.getElementById('breakdown').innerHTML = rows.map(function (r) {
+      return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td></tr>';
+    }).join('');
+    document.getElementById('out').hidden = false;
+  }
+
+  var presets = {
+    upstairs: { rooms: [['Primary', 16, 13], ['Bed 2', 12, 11], ['Bed 3', 11, 10], ['Hall', 10, 4]], stairs: 13 },
+    basement: { rooms: [['Rec room', 24, 18]], stairs: 12 },
+    mainfloor: { rooms: [['Living', 18, 14], ['Dining', 13, 11], ['Office', 11, 10]], stairs: 0 }
+  };
+
+  function loadPreset(key) {
+    roomsEl.innerHTML = '';
+    presets[key].rooms.forEach(function (r) { addRoom(r[0], r[1], r[2]); });
+    document.getElementById('stairs').value = presets[key].stairs;
+    render();
+  }
+
+  document.getElementById('addRoom').addEventListener('click', function () { addRoom('Room ' + (roomSeq + 1), 12, 10); });
+  document.getElementById('go').addEventListener('click', render);
+  document.querySelectorAll('[data-preset]').forEach(function (b) {
+    b.addEventListener('click', function () { loadPreset(b.getAttribute('data-preset')); });
+  });
+  ['roll', 'pattern', 'stairs', 'price', 'padprice'].forEach(function (id) {
+    document.getElementById(id).addEventListener('input', render);
+  });
+  roomsEl.addEventListener('input', render);
+
+  loadPreset('upstairs');
+})();
+</script>
+</body>
+</html>
